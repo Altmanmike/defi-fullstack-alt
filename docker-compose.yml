@@ -1,0 +1,67 @@
+#version: '3.8'
+
+services:
+  # --- 1. SERVICE BACKEND (API PHP 8.4) ---
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    # Le port 9000 est le port par défaut de PHP-FPM
+    expose:
+      - '9000'
+    volumes:
+      # Montage du code pour le développement (changement immédiat)
+      - ./backend:/var/www/html
+    # Ajouter les variables d'environnement de la DB ici
+    environment:
+      DATABASE_URL: 'pgsql://user:password@database:5432/db_name'
+      # Autres secrets...
+    restart: unless-stopped
+
+  # --- 2. SERVICE FRONTEND (NGINX pour la prod) ---
+  frontend:
+    build:
+      context: ./frontend
+      # Utilise le Dockerfile de production (code déjà compilé)
+      dockerfile: Dockerfile.prod
+    ports:
+      # Accès public via le port 8080 (ou 80)
+      - '8089:80'
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # --- 3. SERVICE BASE DE DONNÉES (POSTGRESQL) ---
+  database:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: db_name
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      # ATTENTION: ces credentials doivent être gérés comme des secrets
+      # dans un environnement de production réel.
+    volumes:
+      # Persistance des données de la DB
+      - db_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    # Le port n'a pas besoin d'être exposé au monde extérieur, 
+    # seul le backend y accède.
+
+  # --- 4. SERVEUR WEB (NGINX) --- 
+  nginx:
+    image: nginx:stable-alpine
+    container_name: defi-fullstack-alt-nginx-1
+    ports:
+        # Expose le port 8088 de l'hôte au port 80 du conteneur Nginx
+        - "8088:80" 
+    volumes:
+        # Monte le répertoire public de Symfony dans Nginx
+        - ./backend/public:/var/www/html/public:ro
+        # Monte votre configuration Nginx personnalisée
+        - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+        - backend
+
+# --- VOLUMES pour la persistance des données ---
+volumes:
+  db_data:
