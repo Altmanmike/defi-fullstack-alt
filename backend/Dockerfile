@@ -46,7 +46,7 @@ WORKDIR /var/www/html
 
 # 1. Copier UNIQUEMENT les fichiers de définition des dépendances
 # Docker invalide le cache seulement si ces fichiers changent.
-COPY composer.json composer.lock symfony.lock ./
+COPY composer.json symfony.lock ./
 
 # 2. Installer les dépendances
 # Les flags recommandés pour les builds Docker

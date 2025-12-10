@@ -1,0 +1,22 @@
+###> symfony/framework-bundle ###
+/backend/.env
+/backend/.env.dev
+/backend/.env.local
+/backend/.env.local.php
+/backend/.env.*.local
+/backend/config/secrets/prod/prod.decrypt.private.php
+/backend/public/bundles/
+/backend/var/
+/backend/vendor/
+/backend/composer.lock
+/backend/package-lock.json
+###< symfony/framework-bundle ###
+
+###> phpunit/phpunit ###
+/backend/phpunit.xml
+/backend/.phpunit.result.cache
+###< phpunit/phpunit ###
+###> symfony/phpunit-bridge ###
+/backend/.phpunit.result.cache
+/backend/phpunit.xml
+###< symfony/phpunit-bridge ###

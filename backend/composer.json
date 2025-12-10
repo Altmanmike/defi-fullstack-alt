@@ -7,13 +7,13 @@
         "php": ">=8.2",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "doctrine/dbal": "*",
-        "doctrine/doctrine-bundle": "*",
+        "doctrine/dbal": ">=4.4.1",
+        "doctrine/doctrine-bundle": ">=3.1",
         "doctrine/doctrine-migrations-bundle": "^4.0",
-        "doctrine/orm": "^3.5",
+        "doctrine/orm": "^3.5.8",
         "symfony/console": "7.4.*",
         "symfony/dotenv": "7.4.*",
-        "symfony/flex": "^2",
+        "symfony/flex": "^2.10",
         "symfony/framework-bundle": "7.4.*",
         "symfony/routing": "7.4.*",
         "symfony/runtime": "7.4.*",
@@ -62,7 +62,8 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
-        ]
+        ],
+        "phpunit": "php vendor/bin/phpunit"
     },
     "conflict": {
         "symfony/symfony": "*"
@@ -74,6 +75,8 @@
         }
     },
     "require-dev": {
-        "symfony/maker-bundle": "^1.65"
+        "symfony/maker-bundle": "^1.65.1",
+        "symfony/phpunit-bridge": "^8.0",
+        "phpunit/phpunit": "^9.5"
     }
 }

@@ -1,0 +1,8 @@
+# Ignorer le répertoire des dépendances (meilleure pratique)
+vendor/
+
+# Ignorer le répertoire de cache/log de Symfony
+var/
+
+# Ignorer le fichier problématique "phpunit" à la racine (le fix)
+phpunit

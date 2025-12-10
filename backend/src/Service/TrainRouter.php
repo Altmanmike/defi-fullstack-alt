@@ -59,8 +59,16 @@ class TrainRouter
      */
     public function findShortestPath(string $fromStationId, string $toStationId): array
     {
+        // 1. ✅ AJOUTER CETTE VÉRIFICATION
+        $allStations = array_keys($this->graph);
+        
+        // Si la station de départ ou d'arrivée n'existe pas dans le graphe, on retourne un échec immédiat.
+        if (!in_array($fromStationId, $allStations) || !in_array($toStationId, $allStations)) {
+             return ['distanceKm' => 0.0, 'path' => []]; 
+        }
+        
         // Initialisation des distances (toutes à l'infini, sauf la source à 0)
-        $distances = array_fill_keys(array_keys($this->graph), INF);
+        $distances = array_fill_keys($allStations, INF);
         $distances[$fromStationId] = 0;
         
         // Enregistre le chemin pour reconstruire le trajet final
