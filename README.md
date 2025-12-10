@@ -54,4 +54,9 @@ Ceci est un critère d'évaluation majeur ! Même si vous utilisez un repo GitHu
 * **Sécurité (SAST) :** Utilisez des outils comme **PHPStan** (PHP) et **Trivy** (pour scanner les images Docker et les dépendances npm/composer).
 * **Sécurité (Authentification/HTTPS) :** Gérez les communications sécurisées (HTTPS) via le reverse proxy Docker (par exemple, en utilisant des certificats auto-signés pour le développement ou en documentant l'utilisation de Let's Encrypt).
 
+### 5. Installation en local :
+
+* **Docker :** docker compose up -d (si problèmes docker compose down -v puis docker compose up -d --build --force-recreate)
+* **Backend :** docker compose run --rm backend composer install
+* **Frontend :** cd frontend puis npm install
 ---

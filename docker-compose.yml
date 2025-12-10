@@ -18,18 +18,25 @@ services:
       # Autres secrets...
     restart: unless-stopped
 
-  # --- 2. SERVICE FRONTEND (NGINX pour la prod) ---
+  # --- 2. SERVICE FRONTEND  ---
   frontend:
+    # Utilise le Dockerfile.dev que nous venons de créer
     build:
       context: ./frontend
-      # Utilise le Dockerfile de production (code déjà compilé)
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile.dev 
+    # Mappe le port Vite (5173) au port local
     ports:
-      # Accès public via le port 8080 (ou 80)
-      - '8089:80'
+      - "5173:5173" 
+    environment:
+      # Laissez l'hôte Vite à 0.0.0.0 pour l'accessibilité Docker
+      - VITE_HOST=0.0.0.0 
+    volumes:
+      # Montage du code source (pour le développement en temps réel)
+      - ./frontend:/app 
+      # Empêche Node.js de réécrire les modules sur le volume Windows (très important)
+      - /app/node_modules
     depends_on:
-      - backend
-    restart: unless-stopped
+      - backend # Assure que le backend démarre avant
 
   # --- 3. SERVICE BASE DE DONNÉES (POSTGRESQL) ---
   database:

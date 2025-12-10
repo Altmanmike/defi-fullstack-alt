@@ -1,0 +1,8 @@
+# frontend/Dockerfile.dev
+FROM node:20-alpine
+WORKDIR /app
+# Copie package.json et package-lock.json pour l'installation des dépendances
+COPY package.json package-lock.json ./
+RUN npm install
+# Commande par défaut pour le développement
+CMD ["npm", "run", "dev"]
