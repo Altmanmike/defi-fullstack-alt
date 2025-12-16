@@ -1,0 +1,110 @@
+name: CI/CD Pipeline
+
+on:
+  # Déclenche le pipeline à chaque push sur la branche 'main' ou lors d'une Pull Request
+  push:
+    branches:
+      - main
+  #pull_request:
+    #branches:
+      #- main
+env:
+  DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }} # Personal Access Token - PAT
+  IMAGE_REPO: mikaltman69 # ⬅️ NOM D'UTILISATEUR DOCKER
+
+jobs:
+  # ==================================
+  # 1. JOB DE TESTS ET BUILD DU BACKEND (SYMFONY)
+  # ==================================
+  backend_ci:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend # Exécuter toutes les commandes dans le dossier 'backend'
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build Docker containers
+        run: docker compose -f docker-compose.yml up -d --build
+        
+      - name: Wait for services to be healthy
+        # Attendre que la base de données soit prête avant d'exécuter les migrations/tests
+        run: |
+          echo "Waiting for PostgreSQL..."
+          while ! docker compose -f docker-compose.yml ps | grep db | grep running; do
+            sleep 2
+          done
+          
+      - name: Install Composer dependencies
+        # Exécuter les commandes Composer/Symfony DANS le conteneur PHP
+        run: docker compose exec -T php composer install --no-dev --prefer-dist
+        
+      # - name: Run Database Migrations
+      #   run: docker compose exec -T php bin/console doctrine:migrations:migrate -n
+        
+      - name: Run Backend Unit Tests (PHPUnit)
+        # Exécute les tests unitaires du backend
+        run: docker compose exec -T php bin/phpunit
+
+  # ==================================
+  # 2. JOB DE TESTS DU FRONTEND (VUE/VITEST)
+  # ==================================
+  frontend_ci:
+    runs-on: ubuntu-latest
+    needs: backend_ci # Démarre seulement si le backend a réussi ses tests
+    defaults:
+      run:
+        working-directory: ./frontend # Exécuter toutes les commandes dans le dossier 'frontend'
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Utiliser une action spécifique pour configurer Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' 
+          
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Frontend Unit Tests (Vitest)
+        # Exécute la commande de test que vous avez finalisée
+        run: npm run test
+
+  # ==================================
+  # 3. BUILD ET PUSH DES IMAGES DOCKER (CD)
+  # ==================================
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [backend_ci, frontend_ci] # Démarre seulement si TOUS les tests passent
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        
+      - name: Docker Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKER_USER }}
+          password: ${{ env.DOCKER_TOKEN }}
+          
+      - name: Build and Push Backend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend # Contexte du Dockerfile Symfony
+          push: true
+          tags: ${{ env.IMAGE_REPO }}/symfony-backend:latest
+          file: ./backend/Dockerfile # Assurez-vous d'utiliser votre Dockerfile de production si vous en avez un.
+          
+      - name: Build and Push Frontend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend # Contexte du Dockerfile Vue
+          push: true
+          tags: ${{ env.IMAGE_REPO }}/vue-frontend:latest
+          file: ./frontend/Dockerfile.dev # Assurez-vous d'utiliser votre Dockerfile de production si vous en avez un.
