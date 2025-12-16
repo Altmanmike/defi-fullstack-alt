@@ -39,7 +39,27 @@ jobs:
           # done
           # echo "${SERVICE_NAME} is running. Waiting 5 more seconds for port readiness..."
           # sleep 5 # Temps additionnel pour que PostgreSQL démarre vraiment
+      
+      - name: Wait for PHP container to be running
+        run: |
+          echo "Waiting for PHP service to be fully up..."
+          # Vérifie que le service nommé 'php' (selon votre docker-compose.yml) est bien dans l'état 'running'
+          PHP_SERVICE_NAME="backend" # REMPLACER PAR LE NOM EXACT DU SERVICE PHP DANS VOTRE docker-compose.yml
+                                     # D'après vos logs, le conteneur est appelé 'defi-fullstack-alt-backend-1'. 
+                                     # Le nom du service Docker Compose est probablement 'backend'.
           
+          # Boucle d'attente: on s'assure que le service est marqué comme 'running'
+          while ! docker compose ps --services --filter "name=${PHP_SERVICE_NAME}" --filter "status=running" | grep -q ${PHP_SERVICE_NAME}; do
+            echo "Waiting for ${PHP_SERVICE_NAME}..."
+            sleep 2
+            COUNT=$((COUNT + 1))
+            if [ $COUNT -gt 30 ]; then
+                echo "Timeout reached while waiting for PHP."
+                exit 1
+            fi
+          done
+          echo "${PHP_SERVICE_NAME} is running. Proceeding to Composer install."
+              
       - name: Install Composer dependencies
         # Exécuter les commandes Composer/Symfony DANS le conteneur PHP
         run: docker compose exec -T php composer install --no-dev --prefer-dist
