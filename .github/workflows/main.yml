@@ -69,7 +69,7 @@ jobs:
         
       - name: Run Backend Unit Tests (PHPUnit)
         # Exécute les tests unitaires du backend
-        run: docker compose exec -T backend bin/phpunit
+        run: docker compose exec -T backend vendor/bin/phpunit
         working-directory: ./backend
 
   # ==================================
