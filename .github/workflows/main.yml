@@ -30,10 +30,15 @@ jobs:
       - name: Wait for services to be healthy
         # Attendre que la base de données soit prête avant d'exécuter les migrations/tests
         run: |
-          echo "Waiting for PostgreSQL..."
-          while ! docker compose -f docker-compose.yml ps | grep db_name | grep running; do
-            sleep 2
+          echo "Waiting for DB to start..."
+          # Remplacez 'db' par le nom de votre service DB dans docker-compose.yml (ex: database)
+          SERVICE_NAME="db_name" 
+          while ! docker compose ps --services --filter "name=${SERVICE_NAME}" --filter "status=running" | grep -q ${SERVICE_NAME}; do
+            echo "Waiting for ${SERVICE_NAME}..."
+            sleep 3
           done
+          echo "${SERVICE_NAME} is running. Waiting 5 more seconds for port readiness..."
+          sleep 5 # Temps additionnel pour que PostgreSQL démarre vraiment
           
       - name: Install Composer dependencies
         # Exécuter les commandes Composer/Symfony DANS le conteneur PHP
