@@ -62,7 +62,7 @@ jobs:
 
       - name: Install Composer dependencies
         # Exécuter les commandes Composer/Symfony DANS le conteneur PHP
-        run: docker compose exec -T --user root backend composer install --no-dev --prefer-dist
+        run: docker compose exec -T --user root backend composer install --prefer-dist
         
       # - name: Run Database Migrations
       #   run: docker compose exec -T backend bin/console doctrine:migrations:migrate -n
