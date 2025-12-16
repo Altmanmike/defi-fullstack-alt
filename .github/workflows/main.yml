@@ -31,7 +31,7 @@ jobs:
         # Attendre que la base de données soit prête avant d'exécuter les migrations/tests
         run: |
           echo "Waiting for PostgreSQL..."
-          while ! docker compose -f docker-compose.yml ps | grep db | grep running; do
+          while ! docker compose -f docker-compose.yml ps | grep db_name | grep running; do
             sleep 2
           done
           
