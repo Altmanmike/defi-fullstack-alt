@@ -60,9 +60,9 @@ jobs:
           done
           echo "${PHP_SERVICE_NAME} is running. Proceeding to Composer install."
 
-      - name: Install Composer dependencies
+      #- name: Install Composer dependencies
         # Exécuter les commandes Composer/Symfony DANS le conteneur PHP
-        run: docker compose exec -T backend composer install --no-dev --prefer-dist
+        #run: docker compose exec -T backend composer install --no-dev --prefer-dist
         
       # - name: Run Database Migrations
       #   run: docker compose exec -T backend bin/console doctrine:migrations:migrate -n
