@@ -18,23 +18,20 @@ jobs:
   # 1. JOB DE TESTS ET BUILD DU BACKEND (SYMFONY)
   # ==================================
   backend_ci:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./backend # Exécuter toutes les commandes dans le dossier 'backend'
+    runs-on: ubuntu-latest    
     
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Build Docker containers
-        run: docker compose -f ../docker-compose.yml up -d --build
+        run: docker compose -f docker-compose.yml up -d --build
         
       - name: Wait for services to be healthy
         # Attendre que la base de données soit prête avant d'exécuter les migrations/tests
         run: |
           echo "Waiting for PostgreSQL..."
-          while ! docker compose -f ../docker-compose.yml ps | grep db | grep running; do
+          while ! docker compose -f docker-compose.yml ps | grep db | grep running; do
             sleep 2
           done
           
@@ -48,6 +45,7 @@ jobs:
       - name: Run Backend Unit Tests (PHPUnit)
         # Exécute les tests unitaires du backend
         run: docker compose exec -T php bin/phpunit
+        working-directory: ./backend
 
   # ==================================
   # 2. JOB DE TESTS DU FRONTEND (VUE/VITEST)
