@@ -28,13 +28,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Docker containers
-        run: docker compose -f docker-compose.yml up -d --build
+        run: docker compose -f ../docker-compose.yml up -d --build
         
       - name: Wait for services to be healthy
         # Attendre que la base de données soit prête avant d'exécuter les migrations/tests
         run: |
           echo "Waiting for PostgreSQL..."
-          while ! docker compose -f docker-compose.yml ps | grep db | grep running; do
+          while ! docker compose -f ../docker-compose.yml ps | grep db | grep running; do
             sleep 2
           done
           
