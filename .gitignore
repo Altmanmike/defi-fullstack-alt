@@ -24,4 +24,6 @@
 ###> vue/vuetify/typescript ###
 /frontend/node_modules/
 /frontend/npm-debug.log
+/frontend/dist/
+/frontend/tsconfig.tsbuildinfo
 ###< vue/vuetify/typescript ###

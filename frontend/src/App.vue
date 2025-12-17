@@ -6,7 +6,7 @@ import { VContainer, VForm, VTextField, VBtn, VAlert, VCard, VCardTitle, VCardTe
 // L'URL d'accès au backend Docker. Utilisez 'http://localhost:8088' pour le dev local,
 // ou le nom du service Docker si vous faites l'appel DANS le conteneur Frontend.
 // Pour l'instant, restons sur localhost pour le développement local Vite :
-const API_URL = 'http://localhost:8088/api/v1/routes';
+const API_URL = 'http://localhost:8088/api/v1/route';
 
 // État du formulaire
 const fromStation = ref('MX');

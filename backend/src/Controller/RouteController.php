@@ -4,11 +4,12 @@
 namespace App\Controller;
 
 use App\Service\TrainRouter;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\RouteSegmentRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class RouteController extends AbstractController
 {
@@ -18,7 +19,7 @@ class RouteController extends AbstractController
         // private EntityManagerInterface $entityManager, 
     ) {}
 
-    #[Route('/api/v1/routes', methods: ['POST'])]
+    #[Route('/api/v1/route', methods: ['POST'])]
     public function calculateRoute(Request $request): Response
     {
         // 1. Désérialisation et Validation de la Requête (RouteRequest)
@@ -77,5 +78,33 @@ class RouteController extends AbstractController
         ];
 
         return $this->json($response, Response::HTTP_CREATED); // 201
+    }
+
+    #[Route('/api/v1/routes/all', name: 'api_routes_all', methods: ['GET'])]
+    public function getRoutes(RouteSegmentRepository $repository): JsonResponse
+    {
+        // 1. Récupérer tous les segments depuis la DB
+        $segments = $repository->findAll();
+
+        // 2. Transformer les données pour votre algorithme
+        // On crée un graphe : ['StationA' => ['StationB' => distance, ...], ...]
+        $graph = [];
+        foreach ($segments as $segment) {
+            $start = $segment->getStartStation()->getName();
+            $end = $segment->getEndStation()->getName();
+            $distance = $segment->getDistance();
+
+            $graph[$start][$end] = $distance;
+            // Si vos trajets sont bidirectionnels (aller-retour), décommentez :
+            // $graph[$end][$start] = $distance;
+        }
+
+        // 3. Ici, vous appelez votre algorithme (ex: Dijkstra) avec $graph
+        // $result = $this->pathfinder->calculate($graph, 'ALLI', 'AVA');
+
+        return new JsonResponse([
+            'available_stations' => array_keys($graph),
+            'graph_preview' => $graph // Juste pour tester que la DB répond bien
+        ]);
     }
 }
