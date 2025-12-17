@@ -65,14 +65,14 @@ jobs:
         run: docker compose exec -T --user root backend composer install --prefer-dist
         
       - name: Run Database Migrations
-        run: docker compose exec -T --user root backend bin/console doctrine:migrations:migrate -n
+        run: docker compose exec -T --user root backend php bin/console doctrine:migrations:migrate -n
       
       - name: Load Data Fixtures
-        run: docker compose exec -T --user root backend bin/console doctrine:fixtures:load -n
+        run: docker compose exec -T --user root backend php bin/console doctrine:fixtures:load -n
 
       - name: Run Backend Unit Tests (PHPUnit)
         # Exécute les tests unitaires du backend
-        run: docker compose exec -T --user root backend vendor/bin/phpunit
+        run: docker compose exec -T --user root backend php vendor/bin/phpunit
         working-directory: ./backend
 
   # ==================================
